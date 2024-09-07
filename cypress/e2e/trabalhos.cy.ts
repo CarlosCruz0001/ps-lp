@@ -11,27 +11,30 @@ const requestOptionsPOST: Partial<Cypress.RequestOptions> = {
 describe("Testes sobre o endpoint POST /trabalhos", () => {
   before(() => {
     cy.task("limparBancoDeDados");
-    cy.fixture("trabalho").as("trabalho");
-    cy.fixture("trabalho_com_area_invalida").as("trabalhoComAreaInvalida");
-    cy.fixture("trabalho_com_autor_com_cpf_invalido").as(
-      "trabalhoComAutorComCPFInvalido",
-    );
-    cy.fixture("trabalho_com_autor_com_genero_invalido").as(
-      "trabalhoComAutorComGeneroInvalido",
-    );
-    cy.fixture("trabalho_com_autor_com_nome_invalido").as(
-      "trabalhoComAutorComNomeInvalido",
-    );
-    cy.fixture("trabalho_com_codigo_invalido").as("trabalhoComCodigoInvalido");
-    cy.fixture("trabalho_com_mais_de_sete_autores").as(
-      "trabalhoComMaisDeSeteAutores",
-    );
-    cy.fixture("trabalho_com_um_autor").as("trabalhoComUmAutor");
-    cy.fixture("trabalho_sem_titulo").as("trabalhoSemTitulo");
+    // cy.fixture("trabalho").as("trabalho");
+    // cy.fixture("trabalho_com_area_invalida").as("trabalhoComAreaInvalida");
+    // cy.fixture("trabalho_com_autor_com_cpf_invalido").as(
+    //   "trabalhoComAutorComCPFInvalido",
+    // );
+    // cy.fixture("trabalho_com_autor_com_genero_invalido").as(
+    //   "trabalhoComAutorComGeneroInvalido",
+    // );
+    // cy.fixture("trabalho_com_autor_com_nome_invalido").as(
+    //   "trabalhoComAutorComNomeInvalido",
+    //);
+    //cy.fixture("trabalho_com_codigo_invalido").as("trabalhoComCodigoInvalido");
+    ///cy.fixture("trabalho_com_mais_de_sete_autores").as(
+    //  "trabalhoComMaisDeSeteAutores",
+    ///);
+    // cy.fixture("trabalho_com_um_autor").as("trabalhoComUmAutor");
+    // cy.fixture("trabalho_sem_titulo").as("trabalhoSemTitulo");
   });
 
   it("deve salvar um trabalho com dados válidos", function () {
-    requestOptionsPOST.body = this.trabalho;
+    //requestOptionsPOST.body = this.trabalho;
+    cy.fixture("trabalho").then((trabalhoValido)=>{
+      requestOptionsPOST.body= trabalhoValido
+    })
 
     cy.request(requestOptionsPOST).then((res) => {
       expect(res.status).to.equal(201);
@@ -42,7 +45,10 @@ describe("Testes sobre o endpoint POST /trabalhos", () => {
   });
 
   it("não deve salvar um trabalho com título vazio ou nulo", function () {
-    requestOptionsPOST.body = this.trabalhoSemTitulo;
+    // requestOptionsPOST.body = this.trabalhoSemTitulo;
+    cy.fixture("trabalho_sem_titulo").then((trabalhoSemTitulo) => {
+      requestOptionsPOST.body = trabalhoSemTitulo;
+    });
 
     cy.request(requestOptionsPOST).then((res) => {
       expect(res.status).to.equal(400);
@@ -54,7 +60,10 @@ describe("Testes sobre o endpoint POST /trabalhos", () => {
   });
 
   it("não deve salvar um trabalho com menos de 2 autores", function () {
-    requestOptionsPOST.body = this.trabalhoComUmAutor;
+    // requestOptionsPOST.body = this.trabalhoComUmAutor;
+    cy.fixture("trabalho_com_um_autor").then((trabalhoComUmAutor) => {
+      requestOptionsPOST.body = trabalhoComUmAutor;
+    });
 
     cy.request(requestOptionsPOST).then((res) => {
       expect(res.status).to.equal(400);
@@ -66,7 +75,12 @@ describe("Testes sobre o endpoint POST /trabalhos", () => {
   });
 
   it("não deve salvar um trabalho com mais de 7 autores", function () {
-    requestOptionsPOST.body = this.trabalhoComMaisDeSeteAutores;
+    // requestOptionsPOST.body = this.trabalhoComMaisDeSeteAutores;
+    cy.fixture("trabalho_com_mais_de_sete_autores").then(
+      (trabalhoComMaisDeSeteAutores) => {
+        requestOptionsPOST.body = trabalhoComMaisDeSeteAutores;
+      },
+    );
 
     cy.request(requestOptionsPOST).then((res) => {
       expect(res.status).to.equal(400);
@@ -78,7 +92,10 @@ describe("Testes sobre o endpoint POST /trabalhos", () => {
   });
 
   it("não deve salvar um trabalho com uma área inválida", function () {
-    requestOptionsPOST.body = this.trabalhoComAreaInvalida;
+    // requestOptionsPOST.body = this.trabalhoComAreaInvalida;
+    cy.fixture("trabalho_com_area_invalida").then((trabalhoComAreaInvalida) => {
+      requestOptionsPOST.body = trabalhoComAreaInvalida;
+    });
 
     cy.request(requestOptionsPOST).then((res) => {
       expect(res.status).to.equal(400);
@@ -90,7 +107,12 @@ describe("Testes sobre o endpoint POST /trabalhos", () => {
   });
 
   it("não deve salvar um trabalho com um código inválido", function () {
-    requestOptionsPOST.body = this.trabalhoComCodigoInvalido;
+    // requestOptionsPOST.body = this.trabalhoComCodigoInvalido;
+    cy.fixture("trabalho_com_codigo_invalido").then(
+      (trabalhoComCodigoInvalido) => {
+        requestOptionsPOST.body = trabalhoComCodigoInvalido;
+      },
+    );
 
     cy.request(requestOptionsPOST).then((res) => {
       expect(res.status).to.equal(400);
@@ -102,7 +124,12 @@ describe("Testes sobre o endpoint POST /trabalhos", () => {
   });
 
   it("não deve salvar um trabalho com autor com nome inválido", function () {
-    requestOptionsPOST.body = this.trabalhoComAutorComNomeInvalido;
+    //   requestOptionsPOST.body = this.trabalhoComAutorComNomeInvalido;
+    cy.fixture("trabalho_com_autor_com_nome_invalido").then(
+      (trabalhoComAutorComNomeInvalido) => {
+        requestOptionsPOST.body = trabalhoComAutorComNomeInvalido;
+      },
+    );
 
     cy.request(requestOptionsPOST).then((res) => {
       expect(res.status).to.equal(400);
@@ -114,7 +141,12 @@ describe("Testes sobre o endpoint POST /trabalhos", () => {
   });
 
   it("não deve salvar um trabalho com autor com gênero inválido", function () {
-    requestOptionsPOST.body = this.trabalhoComAutorComGeneroInvalido;
+    // requestOptionsPOST.body = this.trabalhoComAutorComGeneroInvalido;
+    cy.fixture("trabalho_com_autor_com_genero_invalido").then(
+      (trabalhoComAutorComGeneroInvalido) => {
+        requestOptionsPOST.body = trabalhoComAutorComGeneroInvalido;
+      },
+    );
 
     cy.request(requestOptionsPOST).then((res) => {
       expect(res.status).to.equal(400);
@@ -126,7 +158,12 @@ describe("Testes sobre o endpoint POST /trabalhos", () => {
   });
 
   it("não deve salvar um trabalho com autor com CPF inválido", function () {
-    requestOptionsPOST.body = this.trabalhoComAutorComCPFInvalido;
+    //requestOptionsPOST.body = this.trabalhoComAutorComCPFInvalido;
+    cy.fixture("trabalho_com_autor_com_cpf_invalido").then(
+      (trabalhoComAutorComCPFInvalido) => {
+        requestOptionsPOST.body = trabalhoComAutorComCPFInvalido;
+      },
+    );
 
     cy.request(requestOptionsPOST).then((res) => {
       expect(res.status).to.equal(400);

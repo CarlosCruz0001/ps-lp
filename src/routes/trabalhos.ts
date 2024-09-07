@@ -1,7 +1,6 @@
 import { Router } from "express";
 import TrabalhoController from "../controllers/TrabalhoController";
 
-
 const trabalhosRouter = Router();
 
 

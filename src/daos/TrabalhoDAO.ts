@@ -4,14 +4,20 @@ import { Trabalho } from "../entity/Trabalho";
 import { AppDataSource } from "../data-source";
 
 export default class TrabalhoDAO {
-    trabalhoRepo: Repository<Trabalho>;
+  trabalhoRepo: Repository<Trabalho>;
 
-    constructor(){
-        this.trabalhoRepo = AppDataSource.getRepository(Trabalho);
-    }
+  constructor() {
+    this.trabalhoRepo = AppDataSource.getRepository(Trabalho);
+  }
 
-    async salvar(trabalho:Partial<Trabalho>){
-        const trabalhoSalvo = await this.trabalhoRepo.save(trabalho);
-        return trabalhoSalvo
-    }
+  async salvar(trabalho: Partial<Trabalho>) {
+    const trabalhoSalvo = await this.trabalhoRepo.save(trabalho);
+    return trabalhoSalvo;
+  }
+
+  async buscarTrabalhos() {
+    const trabalhos = await this.trabalhoRepo.find();
+
+    return trabalhos; 
+  }
 }

@@ -205,6 +205,15 @@ describe("Testes sobre o endpoint GET /trabalhos/area/:codArea", () => {
   });
 
   it("não deve recuperar trabalhos de uma área inválida", () => {
+        /* eslint-disable prefer-arrow-callback */
+        
+        const requestOptionsGET: Partial<Cypress.RequestOptions> = {
+          method: "GET",
+          url: "/trabalhos/area/:codArea",
+          failOnStatusCode: false,
+        };
+    
+  
     const codArea = "Saúde";
     requestOptionsGET.url = requestOptionsGET.url.replace(":codArea", codArea);
 

@@ -32,6 +32,8 @@ export default defineConfig({
           autores = await autorRepo.find();
           console.log(autores);
 
+          await AppDataSource.destroy();
+
           return null;
         },
 
@@ -81,6 +83,10 @@ export default defineConfig({
 
             await trabalhoRepo.save(trabalho);
           }
+
+          await AppDataSource.destroy();
+
+          return null;
         },
       });
     },

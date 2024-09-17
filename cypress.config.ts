@@ -7,10 +7,8 @@ import { defineConfig } from "cypress";
 import { fakerPT_BR as faker } from "@faker-js/faker";
 
 import { AppDataSource } from "./src/data-source";
-import { Autor } from "./src/entity/Autor";
-import { Trabalho } from "./src/entity/Trabalho";
-import Genero from "./src/entity/Genero";
-import Area from "./src/entity/Area";
+import { Produto } from "./src/entity/Produto";
+import { Item } from "./src/entity/Item";
 
 export default defineConfig({
   e2e: {
@@ -20,68 +18,81 @@ export default defineConfig({
       on("task", {
         async limparBancoDeDados() {
           await AppDataSource.initialize();
-          const autorRepo = AppDataSource.getRepository(Autor);
-          const trabalhoRepo = AppDataSource.getRepository(Trabalho);
-          let trabalhos = await trabalhoRepo.find();
-          await trabalhoRepo.remove(trabalhos);
-          trabalhos = await trabalhoRepo.find();
-          console.log(trabalhos);
+          const produtoRepo = AppDataSource.getRepository(Produto);
+          const itemRepo = AppDataSource.getRepository(Item);
 
-          let autores = await autorRepo.find();
-          await autorRepo.remove(autores);
-          autores = await autorRepo.find();
-          console.log(autores);
+          let itens = await itemRepo.find();
+          await itemRepo.remove(itens);
+          itens = await itemRepo.find();
+          console.log(itens);
+
+          let produtos = await produtoRepo.find();
+          await produtoRepo.remove(produtos);
+          produtos = await produtoRepo.find();
+          console.log(produtos);
 
           await AppDataSource.destroy();
 
           return null;
         },
 
-        async popularBancoDeDados() {
+        async popularBancoDeDadosProduto() {
           await AppDataSource.initialize();
-          const autorRepo = AppDataSource.getRepository(Autor);
-          const trabalhoRepo = AppDataSource.getRepository(Trabalho);
-          const QTDE_AUTORES = 10;
-          const QTDE_TRABALHOS = 100;
+          const produtoRepo = AppDataSource.getRepository(Produto);
+          const QTDE_PRODUTOS = 10;
 
-          const autores: Autor[] = [];
+          const produtos: Produto[] = [];
 
-          for (let i = 0; i < QTDE_AUTORES; i++) {
-            const autor = new Autor();
-            autor.nome = faker.person.fullName();
-            autor.genero =
-              Math.ceil(Math.random() % 2) === 0 ? Genero.F : Genero.M;
-            autor.cpf = "99999999999";
+          const categoriasDeProduto = [
+            "Electronics",
+            "Books",
+            "Clothing",
+            "Home & Kitchen",
+            "Sports",
+            "Toys",
+          ];
 
-            const autorSalvo = await autorRepo.save(autor);
-            autores.push(autorSalvo);
+          for (let i = 0; i < QTDE_PRODUTOS; i++) {
+            const produto = new Produto();
+            const categoriaAleatoria =
+              categoriasDeProduto[
+                Math.floor(Math.random() * categoriasDeProduto.length)
+              ];
+            const descricao = `${faker.commerce.productAdjective()} ${categoriaAleatoria} - ${faker.commerce.productMaterial()}`;
+            produto.descricao = descricao;
+            produto.perecivel = faker.datatype.boolean();
+
+            const produtoSalvo = await produtoRepo.save(produto);
+            produtos.push(produtoSalvo);
           }
 
-          for (let i = 0; i < QTDE_TRABALHOS; i++) {
-            const trabalho = new Trabalho();
-            trabalho.titulo = faker.lorem.sentence();
+          await AppDataSource.destroy();
 
-            if (i < 20) {
-              trabalho.area = Area.CAE;
-              trabalho.autores = autores.slice(0, 2);
-            } else if (i >= 20 && i < 40) {
-              trabalho.area = Area.CBS;
-              trabalho.autores = autores.slice(2, 4);
-            } else if (i >= 40 && i < 60) {
-              trabalho.area = Area.CET;
-              trabalho.autores = autores.slice(4, 6);
-            } else if (i >= 60 && i < 80) {
-              trabalho.area = Area.CHCSA;
-              trabalho.autores = autores.slice(6, 8);
-            } else {
-              trabalho.area = Area.MDIS;
-              trabalho.autores = autores.slice(8);
+          return produtos;
+        },
+
+        async popularBancoDeDadosItem() {
+          await AppDataSource.initialize();
+          const itemRepo = AppDataSource.getRepository(Item);
+          const produtoRepo = AppDataSource.getRepository(Produto);
+          const produtos = await produtoRepo.find();
+          const QTDE_ITENS = 3;
+
+          if (produtos.length === 0) {
+            throw new Error(
+              "Nenhum produto foi encontrado para popular os itens.",
+            );
+          }
+
+          for (const produto of produtos) {
+            for (let i = 0; i < QTDE_ITENS; i++) {
+              const item = new Item();
+              item.quantidade = faker.number.int({ min: 1, max: 100 });
+              item.dataChegadaNoEstoque = faker.date.past();
+              item.produto = produto;
+
+              await itemRepo.save(item);
             }
-
-            const numero = i + 1;
-            trabalho.codigo = `${trabalho.area}${numero < 10 ? `0${numero}` : numero}`;
-
-            await trabalhoRepo.save(trabalho);
           }
 
           await AppDataSource.destroy();
